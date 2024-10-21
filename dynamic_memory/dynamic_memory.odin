@@ -7,11 +7,11 @@ import "core:c/libc"
 import "core:log"
 
 
-using_temp_allocator :: proc() -> int {
-    numbers := make([dynamic]int, context.temp_allocator)
+using_temp_allocator :: proc() -> i8 {
+    numbers := make([dynamic]i8, context.temp_allocator)
 
     for i in 0..<100 {
-        append(&numbers, i)
+        append(&numbers, i8(i))
     }
 
     rand.shuffle(numbers[:])
@@ -25,7 +25,7 @@ using_temp_allocator :: proc() -> int {
     return numbers[0]
 }
 
-advanced_memory_management :: proc() -> int {
+advanced_memory_management :: proc() -> i8 {
     default_allocator := context.allocator 
     tracking_allocator: mem.Tracking_Allocator
     mem.tracking_allocator_init(&tracking_allocator, default_allocator)
@@ -50,10 +50,10 @@ advanced_memory_management :: proc() -> int {
         mem.tracking_allocator_destroy(&tracking_allocator)
     }
  
-    numbers := make([dynamic]int, default_allocator)
+    numbers := make([dynamic]i8, default_allocator)
 
     for i in 0..<100 {
-        append(&numbers, i)
+        append(&numbers, i8(i))
     }
     fmt.println(numbers)
 
@@ -70,14 +70,17 @@ advanced_memory_management :: proc() -> int {
         panic("Bad free detected")
     }  
 
-    some_int := new(int, context.temp_allocator) 
+    some_int := new(i8, context.temp_allocator) 
 
     // Checks for memory leaks
+    /* This can be reused if there are other tasks that
+     needs to be checked for memory leaks within this
+     function scope */
     if reset_tracking_allocator(&tracking_allocator) {
 		libc.getchar()
 	}
     
-    any_int := new(int, context.temp_allocator)
+    any_int := new(i8, context.temp_allocator)
 
     return n
 }
